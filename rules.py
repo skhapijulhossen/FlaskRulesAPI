@@ -9,10 +9,12 @@ date = datetime.datetime.today()
 # Database
 client = pymongo.MongoClient(
     "localhost", port=27017)
-rulesDB = client.list_database_names()
 
+#Rules Database
+rulesDB = client.list_database_names()
 rulesDB = client["Rules"]
 
+# Server Database
 dataDB = client["ServerData"]
 Datacollections = [collection.lower()
                    for collection in dataDB.list_collection_names()]
@@ -27,6 +29,13 @@ class Rules:
         self.Field = field
         self.Criteria = criteria
         self.Value = value
+
+    def createGroup(self):
+        try:
+            rulesDB[self.Group]
+            return {'Response': True}
+        except Exception as e:
+            return {'Response': False, 'Reasons': str(e)}
 
     def get(self):
         try:
@@ -72,7 +81,6 @@ class Rules:
 
     def apply(self):
         rules = self.get()
-        #dataDate = {}
         groups = list(rules.keys())
         data = {}
         for grp in groups:
@@ -84,31 +92,44 @@ class Rules:
                 if target.lower() in Datacollections:
                     try:
                         db = dataDB[target]
-                        if Criteria.lower() == "greater than":
+                        if Criteria.lower() == "gt":
                             matched = db.find(
                                 {targetField[1]: {'$gt': Value}})
                             Rule = rule + \
                                 f"-> {rules[grp][rule]['Field']} > {Value}"
-                        elif Criteria.lower() == "greater than equal to":
+                        elif Criteria.lower() == "gte":
                             matched = db.find(
                                 {targetField[1]: {'$gte': Value}})
                             Rule = rule + \
                                 f"-> {rules[grp][rule]['Field']} >= {Value}"
-                        elif Criteria.lower() == "less than":
+                        elif Criteria.lower() == "lt":
                             matched = db.find(
                                 {targetField[1]: {'$lt': Value}})
                             Rule = rule + \
                                 f"-> {rules[grp][rule]['Field']} < {Value}"
-                        elif Criteria.lower() == "less than equal to":
+                        elif Criteria.lower() == "lte":
                             matched = db.find(
                                 {targetField[1]: {'$lte': Value}})
                             Rule = rule + \
                                 f"-> {rules[grp][rule]['Field']} <= {Value}"
                         else:
                             return False
-                        passedData = {d['ApplicationName']: {d['TierName']: {
-                            "Date": d['Date'], targetField[1]: d[targetField[1]]}} for d in matched}
+                        passedData = {}
+                        for d in matched:
+                            today = str(date).split(' ')[0]
+                            check = d['Date'].split(' ')[0]
+                            print(f'{today}=={check}')
+                            if str(date).split(' ')[0] == d['Date'].split(' ')[0]:
+                                print(d)
+                                passedData[d['ApplicationName']] = {d['TierName']: {
+                                    "Date": d['Date'], targetField[1]: d[targetField[1]]}}
+                        # passedData = {d['ApplicationName']: {d['TierName']: {
+                        #         "Date": d['Date'], targetField[1]: d[targetField[1]]}} for d in matched if str(d['Date'].split[0]) == str(date)}
                         data[Rule] = passedData
+                        
                     except Exception:
                         return False
+        print(data)
         return {str(date).split(' ')[0]: data}
+
+

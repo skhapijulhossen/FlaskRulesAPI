@@ -3,11 +3,14 @@ from rules import Rules
 app = Flask(__name__)
 
 
-# importing routes
-
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/createGroup/<group>', methods=['GET'])
+def createGroup(group):
+    obj = Rules(group=group)
+    return jsonify(obj.createGroup())
 
 
 @app.route('/addRule/<group>&<rule>&<field>&<criteria>&<int:value>', methods=["GET"])
@@ -19,7 +22,7 @@ def addeRule(group, rule, field, criteria, value):
     })
 
 
-@app.route('/allRules/', methods=['GET'])
+@app.route('/getRules/', methods=['GET'])
 def get():
     obj = Rules()
     return jsonify(obj.get())
