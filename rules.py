@@ -4,11 +4,6 @@ import datetime
 
 # Initializing Date
 date = datetime.datetime.today()
-dates = []
-# for i in range(7):
-#     dates.append(str(date).split(' ')[0])
-#     date = date - datetime.timedelta(days=1)
-# dates = dates[::-1]
 
 
 # Database
@@ -117,7 +112,3 @@ class Rules:
                     except Exception:
                         return False
         return {str(date).split(' ')[0]: data}
-
-
-obj = Rules()
-obj.apply()
