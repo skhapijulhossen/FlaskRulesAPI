@@ -4,7 +4,14 @@ import datetime
 
 # Initializing Date
 date = datetime.datetime.today()
+today = date
+previousDates = []
 
+for day in range(7):
+    previousDates.append((str(today).split(' ')[0])) 
+    today = today - datetime.timedelta(days=1)
+    
+print(previousDates)
 
 # Database
 client = pymongo.MongoClient(
@@ -82,54 +89,51 @@ class Rules:
     def apply(self):
         rules = self.get()
         groups = list(rules.keys())
-        data = {}
-        for grp in groups:
-            for rule in list(rules[grp].keys()):
-                targetField = rules[grp][rule]["Field"].lower().split(".")
-                Value = rules[grp][rule]["Value"]
-                Criteria = rules[grp][rule]["Criteria"]
-                target = targetField[0]
-                if target.lower() in Datacollections:
-                    try:
-                        db = dataDB[target]
-                        if Criteria.lower() == "gt":
-                            matched = db.find(
-                                {targetField[1]: {'$gt': Value}})
-                            Rule = rule + \
-                                f"-> {rules[grp][rule]['Field']} > {Value}"
-                        elif Criteria.lower() == "gte":
-                            matched = db.find(
-                                {targetField[1]: {'$gte': Value}})
-                            Rule = rule + \
-                                f"-> {rules[grp][rule]['Field']} >= {Value}"
-                        elif Criteria.lower() == "lt":
-                            matched = db.find(
-                                {targetField[1]: {'$lt': Value}})
-                            Rule = rule + \
-                                f"-> {rules[grp][rule]['Field']} < {Value}"
-                        elif Criteria.lower() == "lte":
-                            matched = db.find(
-                                {targetField[1]: {'$lte': Value}})
-                            Rule = rule + \
-                                f"-> {rules[grp][rule]['Field']} <= {Value}"
-                        else:
+        dataWithDate = {}
+        for day in previousDates:
+            data = {}
+            for grp in groups:
+                for rule in list(rules[grp].keys()):
+                    targetField = rules[grp][rule]["Field"].lower().split(".")
+                    Value = rules[grp][rule]["Value"]
+                    Criteria = rules[grp][rule]["Criteria"]
+                    target = targetField[0]
+                    if target.lower() in Datacollections:
+                        try:
+                            db = dataDB[target]
+                            if Criteria.lower() == "gt":
+                                matched = db.find(
+                                    {targetField[1]: {'$gt': Value}})
+                                Rule = rule + \
+                                    f"-> {rules[grp][rule]['Field']} > {Value}"
+                            elif Criteria.lower() == "gte":
+                                matched = db.find(
+                                    {targetField[1]: {'$gte': Value}})
+                                Rule = rule + \
+                                    f"-> {rules[grp][rule]['Field']} >= {Value}"
+                            elif Criteria.lower() == "lt":
+                                matched = db.find(
+                                    {targetField[1]: {'$lt': Value}})
+                                Rule = rule + \
+                                    f"-> {rules[grp][rule]['Field']} < {Value}"
+                            elif Criteria.lower() == "lte":
+                                matched = db.find(
+                                    {targetField[1]: {'$lte': Value}})
+                                Rule = rule + \
+                                    f"-> {rules[grp][rule]['Field']} <= {Value}"
+                            else:
+                                return False
+                            passedData = {}
+                            for d in matched:
+                                check = d['Date'].split(' ')[0]
+                                if day == check:
+                                    passedData[d['ApplicationName']] = {d['TierName']: {
+                                        "Date": d['Date'], targetField[1]: d[targetField[1]]}}
+                            data[Rule] = passedData
+
+                        except Exception:
                             return False
-                        passedData = {}
-                        for d in matched:
-                            today = str(date).split(' ')[0]
-                            check = d['Date'].split(' ')[0]
-                            print(f'{today}=={check}')
-                            if str(date).split(' ')[0] == d['Date'].split(' ')[0]:
-                                print(d)
-                                passedData[d['ApplicationName']] = {d['TierName']: {
-                                    "Date": d['Date'], targetField[1]: d[targetField[1]]}}
-                        # passedData = {d['ApplicationName']: {d['TierName']: {
-                        #         "Date": d['Date'], targetField[1]: d[targetField[1]]}} for d in matched if str(d['Date'].split[0]) == str(date)}
-                        data[Rule] = passedData
-                        
-                    except Exception:
-                        return False
-        print(data)
-        return {str(date).split(' ')[0]: data}
+            dataWithDate[day] = data
+        return dataWithDate
 
 
