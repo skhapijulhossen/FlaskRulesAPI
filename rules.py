@@ -4,14 +4,6 @@ import datetime
 
 # Initializing Date
 date = datetime.datetime.today()
-today = date
-previousDates = []
-
-for day in range(7):
-    previousDates.append((str(today).split(' ')[0])) 
-    today = today - datetime.timedelta(days=1)
-    
-print(previousDates)
 
 # Database
 client = pymongo.MongoClient(
@@ -86,7 +78,12 @@ class Rules:
         except Exception:
             return False
 
-    def apply(self):
+    def apply(self, days=1):
+        previousDates = []
+        today = date
+        for day in range(days):
+            previousDates.append((str(today).split(' ')[0])) 
+            today = today - datetime.timedelta(days=1)
         rules = self.get()
         groups = list(rules.keys())
         dataWithDate = {}
@@ -121,6 +118,16 @@ class Rules:
                                     {targetField[1]: {'$lte': Value}})
                                 Rule = rule + \
                                     f"-> {rules[grp][rule]['Field']} <= {Value}"
+                            elif Criteria.lower() == "eq":
+                                matched = db.find(
+                                    {targetField[1]: {'$eq': Value}})
+                                Rule = rule + \
+                                    f"-> {rules[grp][rule]['Field']} == {Value}"
+                            elif Criteria.lower() == "neq":
+                                matched = db.find(
+                                    {targetField[1]: {'$not':{'$eq': Value}}})
+                                Rule = rule + \
+                                    f"-> {rules[grp][rule]['Field']} != {Value}"
                             else:
                                 return False
                             passedData = {}
@@ -137,3 +144,4 @@ class Rules:
         return dataWithDate
 
 
+ 

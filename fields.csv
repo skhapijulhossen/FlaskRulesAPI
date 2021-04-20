@@ -1,0 +1,6 @@
+CPU Usage percent,min
+Memory Usage,max
+cpu burnt,max
+application availability,sum
+calls per minute,count
+errors per minute,count

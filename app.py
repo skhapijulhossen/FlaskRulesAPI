@@ -1,6 +1,18 @@
 from flask import Flask, jsonify, request, render_template
 from rules import Rules
+import csv
 app = Flask(__name__)
+
+
+
+
+
+csv_dict = {}
+with open('fields.csv', 'r') as csv_file:
+    reader = csv.reader(csv_file)
+    for row in reader:
+        csv_dict[row[0]] = row[0]+'.'+row[1]
+        print(f'{row[0]}.{row[1]}')
 
 
 @app.route('/')
@@ -15,7 +27,8 @@ def createGroup(group):
 
 @app.route('/addRule/<group>&<rule>&<field>&<criteria>&<int:value>', methods=["GET"])
 def addeRule(group, rule, field, criteria, value):
-    obj = Rules(group=group, ruleName=rule, field=field,
+    field = field.lower()
+    obj = Rules(group=group, ruleName=rule, field=csv_dict[field],
                 criteria=criteria, value=value)
     return jsonify({
         "Response": obj.post()
@@ -44,8 +57,9 @@ def deleteRule(rule):
 
 @app.route('/updateRule/<group>&<rule>&<field>&<criteria>&<int:value>', methods=["GET"])
 def updateRule(group, rule, field, criteria, value):
+    field = field.lower()
     try:
-        obj = Rules(group=group, ruleName=rule, field=field,
+        obj = Rules(group=group, ruleName=rule, field=csv_dict[field],
                     criteria=criteria, value=value)
         return jsonify({
             "Response": obj.update()
@@ -53,14 +67,14 @@ def updateRule(group, rule, field, criteria, value):
     except Exception as e:
         return jsonify({
             "Response": False,
-            "Reason": f"{e}"
+            "Reason": f"{e}kkk"
         })
 
 
-@app.route("/apply/",methods=["GET"])
-def apply():
+@app.route("/apply/<int:days>",methods=["GET"])
+def apply(days):
     obj = Rules()
-    return jsonify(obj.apply())
+    return jsonify(obj.apply(days=days))
 
 
 
