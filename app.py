@@ -55,10 +55,12 @@ def deleteRule(rule):
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
     except Exception as e:
-        return jsonify({
+        response = jsonify({
             "Response": False,
             "Reason": f"{e}"
         })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
 
 
 @app.route('/updateRule/<group>&<rule>&<field>&<criteria>&<int:value>', methods=["GET"])
@@ -73,11 +75,12 @@ def updateRule(group, rule, field, criteria, value):
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
     except Exception as e:
-        return jsonify({
+        response = jsonify({
             "Response": False,
             "Reason": f"{e}"
         })
-
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
 
 @app.route("/apply/<int:days>", methods=["GET"])
 def apply(days):
