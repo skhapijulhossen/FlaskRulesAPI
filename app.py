@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request, render_template
 from rules import Rules
 from flask_cors import CORS, cross_origin
 import csv
-# from flask_cors import CORS, cross_origin
+
 app = Flask(__name__)
 CORS(app=app, resources={r'/*': {'origins': '*'}}, supports_credentials=True)
 
