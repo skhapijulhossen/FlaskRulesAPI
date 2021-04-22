@@ -177,6 +177,4 @@ class Rules:
             dataWithDate[day] = data
         return dataWithDate
 
-obj = Rules()
-#obj.createGroup("Service Health")
-print(obj.editGroups("Service Healths","Service Health"))
+
