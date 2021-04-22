@@ -22,8 +22,31 @@ def index():
 @app.route('/createGroup/<group>', methods=['GET'])
 @cross_origin()
 def createGroup(group):
-    obj = Rules(group=group)
-    response = jsonify(obj.createGroup())
+    obj = Rules()
+    response = jsonify(obj.createGroup(group))
+    return response
+
+
+@app.route('/getGroups/', methods=['GET'])
+@cross_origin()
+def getGroup():
+    obj = Rules()
+    response = jsonify(obj.getGroups())
+    return response
+
+
+@app.route('/editGroup/<group>&<newName>', methods=['GET'])
+@cross_origin()
+def editGroup(group, newName):
+    obj = Rules()
+    response = jsonify(obj.editGroups(group, newName))
+    return response
+
+@app.route('/deleteGroup/<group>', methods=['GET'])
+@cross_origin()
+def deleteGroup(group):
+    obj = Rules()
+    response = jsonify(obj.deleteGroup(group))
     return response
 
 

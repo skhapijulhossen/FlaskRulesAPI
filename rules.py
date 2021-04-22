@@ -29,12 +29,46 @@ class Rules:
         self.Criteria = criteria
         self.Value = value
 
-    def createGroup(self):
+    def createGroup(self, group):
         try:
-            rulesDB[self.Group]
+            rulesDB['Groups'].insert_one({'_id':group})
             return {'Response': True}
         except Exception as e:
             return {'Response': False, 'Reasons': str(e)}
+    
+    def getGroups(self):
+        try:
+            resultSet = rulesDB['Groups'].find()
+            groups = {group['_id']: group['_id'] for group in resultSet}
+            return {'Groups':groups}
+        except Exception as e:
+            return {'Response': False, 'Reasons': str(e)}
+
+
+    def editGroups(self, groupName, newName):
+        if groupName in self.getGroups()['Groups'].values():
+            try:
+                self.collection = rulesDB["Groups"]
+                self.collection.delete_one({"_id": groupName})
+                self.createGroup(newName)
+                self.rules= rulesDB["Rules"]
+                self.rules.update_many({"Group":groupName},{'$set':{'Group':newName}})
+                return {"Response":True}
+            except Exception:
+                return {"Response":False}
+
+
+    def deleteGroup(self, groupName):
+        if groupName in self.getGroups()['Groups'].values():
+            try:
+                self.collection = rulesDB["Groups"]
+                self.collection.delete_one({"_id": groupName})
+                return {"Response":True}
+            except Exception as e:
+                return {'Response': False, 'Reasons': str(e)}
+        else:
+            return {"Response":False}
+
 
     def get(self):
         try:
@@ -143,5 +177,6 @@ class Rules:
             dataWithDate[day] = data
         return dataWithDate
 
-
- 
+obj = Rules()
+#obj.createGroup("Service Health")
+print(obj.editGroups("Service Healths","Service Health"))
