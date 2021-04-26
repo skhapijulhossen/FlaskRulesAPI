@@ -15,7 +15,7 @@ rulesDB = client["Rules"]
 
 # Server Database
 dataDB = client["ServerData"]
-Datacollections = [collection.lower()
+Datacollections = [collection
                    for collection in dataDB.list_collection_names()]
 
 
@@ -125,11 +125,11 @@ class Rules:
             data = {}
             for grp in groups:
                 for rule in list(rules[grp].keys()):
-                    targetField = rules[grp][rule]["Field"].lower().split(".")
+                    targetField = rules[grp][rule]["Field"].split(".")
                     Value = rules[grp][rule]["Value"]
                     Criteria = rules[grp][rule]["Criteria"]
                     target = targetField[0]
-                    if target.lower() in Datacollections:
+                    if target in Datacollections:
                         try:
                             db = dataDB[target]
                             if Criteria.lower() == "gt":

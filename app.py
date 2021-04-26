@@ -53,7 +53,6 @@ def deleteGroup(group):
 @app.route('/addRule/<group>&<rule>&<field>&<criteria>&<int:value>', methods=["GET"])
 @cross_origin()
 def addeRule(group, rule, field, criteria, value):
-    field = field.lower()
     obj = Rules(group=group, ruleName=rule, field=csv_dict[field],
                 criteria=criteria, value=value)
     response = jsonify({
@@ -90,7 +89,6 @@ def deleteRule(rule):
 @app.route('/updateRule/<group>&<rule>&<field>&<criteria>&<int:value>', methods=["GET"])
 @cross_origin()
 def updateRule(group, rule, field, criteria, value):
-    field = field.lower()
     try:
         obj = Rules(group=group, ruleName=rule, field=csv_dict[field],
                     criteria=criteria, value=value)
