@@ -10,8 +10,7 @@ client = pymongo.MongoClient(
     "localhost", port=27017)
 
 #Rules Database
-rulesDB = client.list_database_names()
-rulesDB = client["Rules"]
+rulesDB = client.list_database_names(); rulesDB = client["Rules"]
 
 # Server Database
 dataDB = client["ServerData"]
